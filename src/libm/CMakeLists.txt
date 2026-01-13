@@ -198,9 +198,14 @@ add_custom_target(renameCUDA.h_generated DEPENDS ${HEADER_CUDA})
 # --------------------------------------------------------------------
 add_custom_target(${TARGET_HEADERS} ALL
   DEPENDS
-    ${SLEEF_INCLUDE_HEADER}            # Output only
-    ${HEADER_FILES_GENERATED}          # Output only
+    ${SLEEF_INCLUDE_HEADER}
 )
+
+foreach(SIMD ${SLEEF_SUPPORTED_LIBM_EXTENSIONS})
+  if(COMPILER_SUPPORTS_${SIMD})
+    add_dependencies(${TARGET_HEADERS} rename${SIMD}.h_generated)
+  endif()
+endforeach()
 
 # --------------------------------------------------------------------
 # TARGET_MKALIAS
