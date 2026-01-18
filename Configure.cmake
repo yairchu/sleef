@@ -122,6 +122,10 @@ if (SLEEF_ENABLE_TLFLOAT)
     list(APPEND TLFLOAT_CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
   endif()
 
+  if (CMAKE_MSVC_RUNTIME_LIBRARY)
+    list(APPEND TLFLOAT_CMAKE_ARGS -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY})
+  endif()
+
   if (EXISTS "${TLFLOAT_SOURCE_DIR}/CMakeLists.txt")
     # If the source code of tlfloat is already downloaded, use it
     ExternalProject_Add(ext_tlfloat

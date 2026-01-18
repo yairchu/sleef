@@ -281,7 +281,6 @@ set(COSTOVERRIDE_RVVM2 3)
 
 #
 
-enable_testing()
 enable_language(CXX)
 
 if (SLEEF_ENABLE_CUDA)
