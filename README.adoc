@@ -53,7 +53,7 @@ It is also recommended to have the following tools.
 * Ninja
 * Git
 
-https://github.com/shibatch/tlfloat[TLFloat] is automatically downloaded if no suitable version is found on your system.
+https://github.com/shibatch/tlfloat[TLFloat] is automatically downloaded and integrated via https://github.com/cpm-cmake/CPM.cmake[CPM.cmake] (CMake Package Manager) from the official shibatch/tlfloat repository. No manual installation is required.
 
 Some tests require:
 
