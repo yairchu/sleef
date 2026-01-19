@@ -244,9 +244,9 @@ endif()
 # Original sleef sources
 set(STANDARD_SOURCES rempitab.c)
 
-add_library(${TARGET_LIBSLEEF} ${STANDARD_SOURCES})
-target_link_libraries(${TARGET_LIBSLEEF} ${TARGET_COMMONXX_OBJ} ${TLFLOAT_LIBRARIES})
-add_dependencies(${TARGET_LIBSLEEF} ${TARGET_HEADERS} ext_tlfloat)
+add_library(${TARGET_LIBSLEEF} ${STANDARD_SOURCES} $<TARGET_OBJECTS:${TARGET_COMMONXX_OBJ}>)
+target_link_libraries(${TARGET_LIBSLEEF} PRIVATE tlfloat)
+add_dependencies(${TARGET_LIBSLEEF} ${TARGET_HEADERS})
 set_target_properties(${TARGET_LIBSLEEF} PROPERTIES
   VERSION ${SLEEF_VERSION}
   SOVERSION ${SLEEF_SOVERSION}
@@ -325,7 +325,7 @@ foreach(SIMD ${SLEEF_SUPPORTED_LIBM_EXTENSIONS})
 	)
     endif()
 
-    add_dependencies(${OBJECT_${SIMD}} rename${SIMD}.h_generated ext_tlfloat)
+    add_dependencies(${OBJECT_${SIMD}} rename${SIMD}.h_generated)
 
     set_target_properties(${OBJECT_${SIMD}} PROPERTIES
       ${COMMON_TARGET_PROPERTIES}

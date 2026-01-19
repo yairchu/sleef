@@ -67,4 +67,3 @@ endif()
 # Target TARGET_COMMONXX_OBJ
 add_library(${TARGET_COMMONXX_OBJ} OBJECT commonxx.cpp)
 target_compile_definitions(${TARGET_COMMONXX_OBJ} PRIVATE ${COMMON_TARGET_DEFINITIONS})
-install(TARGETS ${TARGET_COMMONXX_OBJ} EXPORT sleefTargets)

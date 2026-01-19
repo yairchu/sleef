@@ -1,0 +1,9 @@
+# Build artifacts
+build/
+_deps/
+
+# CPM cache
+cmake/CPM_*.cmake
+
+# Submodules directory (no longer using git submodules for tlfloat)
+submodules/tlfloat/

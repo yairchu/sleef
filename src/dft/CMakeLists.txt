@@ -357,7 +357,7 @@ foreach(T ${LIST_SUPPORTED_FPTYPE})
       target_include_directories(${UG} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
       target_compile_definitions(${UG} PRIVATE ${COMMON_TARGET_DEFINITIONS} ${MACRODEF_${E}})
       target_compile_options(${UG} PRIVATE ${CFLAGS_${E}})
-      add_dependencies(${UG} ${TARGET_HEADERS} unroll_target_${ST} ext_tlfloat)
+      add_dependencies(${UG} ${TARGET_HEADERS} unroll_target_${ST})
       list(APPEND UNROLL_OBJECTS $<TARGET_OBJECTS:${UG}>)
     endforeach()
   endforeach()
@@ -366,7 +366,7 @@ endforeach()
 # Target libdft
 
 add_library(${TARGET_LIBDFT} $<TARGET_OBJECTS:dftcommon_obj> $<TARGET_OBJECTS:dft_obj> ${UNROLL_OBJECTS})
-target_link_libraries(${TARGET_LIBDFT} ${TARGET_LIBSLEEF} ${TLFLOAT_LIBRARIES} ${LIBM})
+target_link_libraries(${TARGET_LIBDFT} PRIVATE ${TARGET_LIBSLEEF} tlfloat ${LIBM})
 
 set_target_properties(${TARGET_LIBDFT} PROPERTIES
   VERSION ${SLEEF_VERSION}

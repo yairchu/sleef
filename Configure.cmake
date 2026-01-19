@@ -88,78 +88,58 @@ if (NOT SLEEF_ENABLE_MPFR)
   set(LIB_MPFR "")
 endif()
 
-# Include submodules
+# Include CPM for dependency management
+include(cmake/CPM.cmake)
 
-set(SLEEF_SUBMODULE_INSTALL_DIR "${CMAKE_BINARY_DIR}/submodules")
-
-include(ExternalProject)
-include(FindPkgConfig)
-
-if (NOT EXISTS "${PROJECT_SOURCE_DIR}/submodules")
-  file(MAKE_DIRECTORY "${PROJECT_SOURCE_DIR}/submodules")
-endif()
-
-# Include TLFloat as a submodule
+# Include TLFloat via CPM
+# TLFloat is always obtained via CPM.cmake from the official shibatch/tlfloat repository
 
 if (SLEEF_ENABLE_TLFLOAT)
-  set(TLFLOAT_MINIMUM_VERSION 1.16.0)
+  # Specify the git tag/commit to use for tlfloat
   set(TLFLOAT_GIT_TAG "4cc749ac08c910894a632a94afa68a157cb68d4c")
-
-  set(TLFLOAT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/submodules/tlfloat")
-  set(TLFLOAT_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}")
-
-  set(TLFLOAT_CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${TLFLOAT_INSTALL_DIR} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DBUILD_LIBS=True -DBUILD_UTILS=False -DBUILD_TESTS=False -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS})
-
-  if (CMAKE_C_COMPILER)
-    list(APPEND TLFLOAT_CMAKE_ARGS -DCMAKE_C_COMPILER:PATH=${CMAKE_C_COMPILER})
-  endif()
-
-  if (CMAKE_CXX_COMPILER)
-    list(APPEND TLFLOAT_CMAKE_ARGS -DCMAKE_CXX_COMPILER:PATH=${CMAKE_CXX_COMPILER})
-  endif()
-
-  if (CMAKE_TOOLCHAIN_FILE)
-    list(APPEND TLFLOAT_CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
-  endif()
-
-  if (CMAKE_MSVC_RUNTIME_LIBRARY)
-    list(APPEND TLFLOAT_CMAKE_ARGS -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY})
-  endif()
-
-  if (EXISTS "${TLFLOAT_SOURCE_DIR}/CMakeLists.txt")
-    # If the source code of tlfloat is already downloaded, use it
-    ExternalProject_Add(ext_tlfloat
-      SOURCE_DIR "${TLFLOAT_SOURCE_DIR}"
-      CMAKE_ARGS ${TLFLOAT_CMAKE_ARGS}
-      UPDATE_DISCONNECTED TRUE
-    )
-    include_directories(BEFORE "${TLFLOAT_INSTALL_DIR}/include")
-    link_directories(BEFORE "${TLFLOAT_INSTALL_DIR}/lib")
-    set(TLFLOAT_LIBRARIES "tlfloat")
-  else()
-    pkg_search_module(TLFLOAT tlfloat)
-
-    if (TLFLOAT_FOUND AND TLFLOAT_VERSION VERSION_GREATER_EQUAL TLFLOAT_MINIMUM_VERSION)
-      # If tlfloat is installed on the system
-      add_custom_target(ext_tlfloat ALL)
-      include_directories(BEFORE "${TLFLOAT_INCLUDE_DIRS}")
-      link_directories(BEFORE "${TLFLOAT_LIBDIR}")
-      message(STATUS "Found installed TLFloat " ${TLFLOAT_VERSION})
-    else()
-      # Otherwise, download the source code
-      find_package(Git REQUIRED)
-      ExternalProject_Add(ext_tlfloat
-	GIT_REPOSITORY https://github.com/shibatch/tlfloat
-	GIT_TAG "${TLFLOAT_GIT_TAG}"
-	SOURCE_DIR "${TLFLOAT_SOURCE_DIR}"
-	CMAKE_ARGS ${TLFLOAT_CMAKE_ARGS}
-	UPDATE_DISCONNECTED TRUE
+  
+  message(STATUS "Fetching TLFloat via CPM from https://github.com/shibatch/tlfloat")
+  
+  # Use CPM to fetch and configure tlfloat
+  CPMAddPackage(
+    NAME tlfloat
+    GIT_REPOSITORY https://github.com/shibatch/tlfloat
+    GIT_TAG ${TLFLOAT_GIT_TAG}
+    OPTIONS
+      "BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS}"
+      "BUILD_LIBS ON"
+      "BUILD_UTILS OFF"
+      "BUILD_TESTS OFF"
+  )
+  
+  if(tlfloat_ADDED)
+    message(STATUS "TLFloat fetched successfully via CPM")
+    # Set CMAKE_POSITION_INDEPENDENT_CODE for the tlfloat targets if they exist
+    if(TARGET tlfloat)
+      set_target_properties(tlfloat PROPERTIES POSITION_INDEPENDENT_CODE ON)
+      # Install tlfloat as part of the sleef export set to avoid CMake export errors
+      install(TARGETS tlfloat EXPORT sleefTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tlfloat
       )
-
-      include_directories(BEFORE "${TLFLOAT_INSTALL_DIR}/include")
-      link_directories(BEFORE "${TLFLOAT_INSTALL_DIR}/lib")
-      set(TLFLOAT_LIBRARIES "tlfloat")
     endif()
+    if(TARGET tlfloat_inline)
+      set_target_properties(tlfloat_inline PROPERTIES POSITION_INDEPENDENT_CODE ON)
+      install(TARGETS tlfloat_inline EXPORT sleefTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tlfloat
+      )
+    endif()
+    # Add tlfloat include directories to the project
+    # This makes tlfloat headers available to all sleef targets
+    include_directories(BEFORE "${tlfloat_SOURCE_DIR}/src/include")
+    include_directories(BEFORE "${tlfloat_BINARY_DIR}/include")
+  else()
+    message(FATAL_ERROR "Failed to fetch TLFloat via CPM")
   endif()
 endif(SLEEF_ENABLE_TLFLOAT)
 
