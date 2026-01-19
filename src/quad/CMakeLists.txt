@@ -214,7 +214,7 @@ foreach(SIMD ${SLEEF_SUPPORTED_QUAD_EXTENSIONS})
   endif()
 endforeach()
 
-add_library(sleefquad rempitabqp.c printf.c ${SLEEFQUAD_OBJECTS})
+add_library(sleefquad rempitabqp.c printf.c ${SLEEFQUAD_OBJECTS} $<TARGET_OBJECTS:${TARGET_COMMONXX_OBJ}>)
 
 set_target_properties(sleefquad PROPERTIES
   VERSION ${SLEEF_VERSION}
@@ -229,7 +229,7 @@ if(LIBM AND ((NOT COMPILER_SUPPORTS_BUILTIN_MATH) OR (SLEEF_ARCH_32BIT AND SLEEF
   target_link_libraries(sleefquad ${LIBM})
 endif()
 
-target_link_libraries(sleefquad ${TARGET_COMMONXX_OBJ} ${TARGET_LIBSLEEF} tlfloat ${LIBM})
+target_link_libraries(sleefquad PRIVATE ${TARGET_LIBSLEEF} tlfloat ${LIBM})
 
 # --------------------------------------------------------------------
 # Inline headers

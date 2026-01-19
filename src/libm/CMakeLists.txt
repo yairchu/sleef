@@ -244,8 +244,8 @@ endif()
 # Original sleef sources
 set(STANDARD_SOURCES rempitab.c)
 
-add_library(${TARGET_LIBSLEEF} ${STANDARD_SOURCES})
-target_link_libraries(${TARGET_LIBSLEEF} ${TARGET_COMMONXX_OBJ} tlfloat)
+add_library(${TARGET_LIBSLEEF} ${STANDARD_SOURCES} $<TARGET_OBJECTS:${TARGET_COMMONXX_OBJ}>)
+target_link_libraries(${TARGET_LIBSLEEF} PRIVATE tlfloat)
 add_dependencies(${TARGET_LIBSLEEF} ${TARGET_HEADERS})
 set_target_properties(${TARGET_LIBSLEEF} PROPERTIES
   VERSION ${SLEEF_VERSION}

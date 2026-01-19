@@ -103,20 +103,39 @@ if (SLEEF_ENABLE_TLFLOAT)
   # Use CPM to fetch and configure tlfloat
   CPMAddPackage(
     NAME tlfloat
-    GITHUB_REPO shibatch/tlfloat
+    GIT_REPOSITORY https://github.com/shibatch/tlfloat
     GIT_TAG ${TLFLOAT_GIT_TAG}
     OPTIONS
+      "BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS}"
       "BUILD_LIBS ON"
       "BUILD_UTILS OFF"
       "BUILD_TESTS OFF"
-      "CMAKE_POSITION_INDEPENDENT_CODE ON"
   )
   
   if(tlfloat_ADDED)
     message(STATUS "TLFloat fetched successfully via CPM")
-    # The tlfloat target is now available for linking
-    # No need to set include directories or link directories manually
-    # CPM handles this through target properties
+    # Set CMAKE_POSITION_INDEPENDENT_CODE for the tlfloat targets if they exist
+    if(TARGET tlfloat)
+      set_target_properties(tlfloat PROPERTIES POSITION_INDEPENDENT_CODE ON)
+      # Install tlfloat as part of the sleef export set to avoid CMake export errors
+      install(TARGETS tlfloat EXPORT sleefTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+      )
+    endif()
+    if(TARGET tlfloat_inline)
+      set_target_properties(tlfloat_inline PROPERTIES POSITION_INDEPENDENT_CODE ON)
+      install(TARGETS tlfloat_inline EXPORT sleefTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+      )
+    endif()
+    # Add tlfloat include directories to the project
+    # This makes tlfloat headers available to all sleef targets
+    include_directories(BEFORE "${tlfloat_SOURCE_DIR}/src/include")
+    include_directories(BEFORE "${tlfloat_BINARY_DIR}/include")
   else()
     message(FATAL_ERROR "Failed to fetch TLFloat via CPM")
   endif()
