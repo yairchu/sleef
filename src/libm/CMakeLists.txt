@@ -245,7 +245,7 @@ endif()
 set(STANDARD_SOURCES rempitab.c)
 
 add_library(${TARGET_LIBSLEEF} ${STANDARD_SOURCES})
-target_link_libraries(${TARGET_LIBSLEEF} ${TARGET_COMMONXX_OBJ} ${TLFLOAT_LIBRARIES})
+target_link_libraries(${TARGET_LIBSLEEF} PUBLIC ${TARGET_COMMONXX_OBJ} ${TLFLOAT_LIBRARIES})
 add_dependencies(${TARGET_LIBSLEEF} ${TARGET_HEADERS} ext_tlfloat)
 set_target_properties(${TARGET_LIBSLEEF} PROPERTIES
   VERSION ${SLEEF_VERSION}
@@ -521,7 +521,7 @@ endif(SLEEF_BUILD_INLINE_HEADERS)
 # use some of the math functions used in the scalar code (for example
 # sqrt).
 if(LIBM AND NOT COMPILER_SUPPORTS_BUILTIN_MATH)
-  target_link_libraries(${TARGET_LIBSLEEF} ${LIBM})
+  target_link_libraries(${TARGET_LIBSLEEF} PUBLIC ${LIBM})
 endif()
 
 target_sources(${TARGET_LIBSLEEF} PRIVATE $<TARGET_OBJECTS:${TARGET_LIBCOMMON_OBJ}>)

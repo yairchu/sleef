@@ -366,7 +366,7 @@ endforeach()
 # Target libdft
 
 add_library(${TARGET_LIBDFT} $<TARGET_OBJECTS:dftcommon_obj> $<TARGET_OBJECTS:dft_obj> ${UNROLL_OBJECTS})
-target_link_libraries(${TARGET_LIBDFT} ${TARGET_LIBSLEEF} ${TLFLOAT_LIBRARIES} ${LIBM})
+target_link_libraries(${TARGET_LIBDFT} PUBLIC ${TARGET_LIBSLEEF} ${TLFLOAT_LIBRARIES} ${LIBM})
 
 set_target_properties(${TARGET_LIBDFT} PROPERTIES
   VERSION ${SLEEF_VERSION}
